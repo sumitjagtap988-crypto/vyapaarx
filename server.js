@@ -78,7 +78,7 @@ if(!db.prepare("SELECT id FROM users WHERE email=?").get(adminEmail)){
 
 app.use(express.json({limit:"2mb"}));
 app.use(express.urlencoded({extended:true}));
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static(__dirname));
 
 const uploadDir=path.join(__dirname,"public","uploads");
 fs.mkdirSync(uploadDir,{recursive:true});
