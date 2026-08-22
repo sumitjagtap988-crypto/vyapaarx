@@ -205,4 +205,8 @@ app.get("*",(req,res)=>{
  if(req.path.startsWith("/api/")) return res.status(404).json({error:"API route not found"});
  res.sendFile(path.join(__dirname,"public","index.html"));
 });
-app.listen(PORT,()=>console.log(`VyapaarX v2 running on http://localhost:${PORT}`));
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`VyapaarX v2 running on port ${PORT}`);
+});
