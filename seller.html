@@ -1,8 +1,117 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sell on VyapaarX</title><link rel="stylesheet" href="style.css"></head><body><header><a class="brand" href="/">Vyapaar<span>X</span><small>Seller Centre</small></a><nav><a href="/">Home</a><a href="/products.html">Products</a><a href="/login.html">Login</a></nav></header><main class="page"><h1>Sell on VyapaarX</h1><p>First create/login to a seller account, then submit your business and product.</p>
 <form id="seller" class="form"><h2>1. Seller Profile</h2><label>Business Name<input required name="business_name"></label><div class="two"><label>Category<select name="category"><option>Water & Beverage</option><option>Retail Products</option></select></label><label>City<input name="city" placeholder="Mumbai"></label></div><button class="btn blue">Create Seller Profile</button></form>
 <form id="product" class="form" style="margin-top:20px"><h2>2. Add Product</h2><div class="two"><label>Product Name<input required name="name"></label><label>Category<select name="category"><option>Water & Beverage</option><option>Retail Products</option></select></label></div><div class="two"><label>Price<input required type="number" step="0.01" name="price"></label><label>Unit<input name="unit" value="/ Piece"></label></div><div class="two"><label>MOQ<input type="number" name="moq" value="1"></label><label>Image<input type="file" name="image" accept="image/*"></label></div><label>Description<textarea name="description" rows="5"></textarea></label><button class="btn green">Submit for Admin Approval</button></form><p id="msg"></p></main><script>
-const T=()=>({Authorization:'Bearer '+localStorage.getItem('vxToken')});
-async function send(url,opts){opts=opts||{};opts.headers={...(opts.headers||{}),...T()};const r=await fetch(url,opts);const x=await r.json();if(!r.ok)throw new Error(x.error||'Request failed');return x}
-seller.onsubmit=async e=>{e.preventDefault();try{const f=new FormData(seller),x=Object.fromEntries(f);await send('/api/sellers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(x)});msg.textContent='Seller profile submitted. Now add a product.'}catch(err){msg.textContent=err.message}};
-product.onsubmit=async e=>{e.preventDefault();try{const f=new FormData(product);const x=await send('/api/products',{method:'POST',body:f});msg.textContent='Product submitted for admin approval. Product ID: '+x.productId;product.reset()}catch(err){msg.textContent=err.message}};
-</script></body></html>
+<script>
+const sellerForm = document.getElementById("seller");
+const productForm = document.getElementById("product");
+const message = document.getElementById("msg");
+
+function getToken() {
+  return localStorage.getItem("vxToken");
+}
+
+async function send(url, options = {}) {
+  const token = getToken();
+
+  if (!token) {
+    throw new Error("Please login first.");
+  }
+
+  const headers = {
+    ...(options.headers || {}),
+    Authorization: "Bearer " + token
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+
+  let data = {};
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("Server returned an invalid response.");
+  }
+
+  if (!response.ok) {
+    throw new Error(data.error || "Request failed");
+  }
+
+  return data;
+}
+
+sellerForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  message.textContent = "Creating seller profile...";
+  message.style.color = "blue";
+
+  const formData = new FormData(sellerForm);
+
+  const data = {
+    business_name: formData.get("business_name"),
+    category: formData.get("category"),
+    city: formData.get("city")
+  };
+
+  try {
+    const result = await send("/api/sellers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    message.textContent =
+      "Seller profile created successfully! Seller ID: " +
+      result.sellerId;
+
+    message.style.color = "green";
+
+  } catch (error) {
+
+    message.textContent = error.message;
+    message.style.color = "red";
+
+    if (
+      error.message === "Login required" ||
+      error.message === "Invalid or expired login"
+    ) {
+      setTimeout(() => {
+        window.location.href = "/login.html";
+      }, 1500);
+    }
+  }
+});
+
+productForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  message.textContent = "Submitting product...";
+  message.style.color = "blue";
+
+  const formData = new FormData(productForm);
+
+  try {
+    const result = await send("/api/products", {
+      method: "POST",
+      body: formData
+    });
+
+    message.textContent =
+      "Product submitted for admin approval. Product ID: " +
+      result.productId;
+
+    message.style.color = "green";
+
+    productForm.reset();
+
+  } catch (error) {
+
+    message.textContent = error.message;
+    message.style.color = "red";
+  }
+});
+</script>
