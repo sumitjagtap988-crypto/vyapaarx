@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sell on VyapaarX</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <a class="brand" href="/">
+    Vyapaar<span>X</span>
+    <small>Seller Centre</small>
+  </a>
+
+  <nav>
+    <a href="/">Home</a>
+    <a href="/products.html">Products</a>
+    <a href="/login.html">Login</a>
+  </nav>
+</header>
+
+<main class="page">
+
+  <h1>Sell on VyapaarX</h1>
+
+  <p>
+    Create your seller profile and list your products.
+  </p>
+
+  <!-- SELLER PROFILE -->
+
+  <form id="sellerForm" class="form">
+
+    <h2>1. Seller Profile</h2>
+
+    <label>
+      Business Name
+      <input
+        type="text"
+        id="businessName"
+        required
+        placeholder="Your business name"
+      >
+    </label>
+
+    <div class="two">
+
+      <label>
+        Category
+
+        <select id="sellerCategory">
+
+          <option value="Water & Beverage">
+            Water & Beverage
+          </option>
+
+          <option value="Retail Products">
+            Retail Products
+          </option>
+
+        </select>
+
+      </label>
+
+      <label>
+        City
+
+        <input
+          type="text"
+          id="sellerCity"
+          placeholder="Dombivli"
+          required
+        >
+
+      </label>
+
+    </div>
+
+    <button
+      type="submit"
+      class="btn blue"
+      id="sellerButton"
+    >
+      Create Seller Profile
+    </button>
+
+  </form>
+
+
+  <!-- PRODUCT -->
+
+  <form
+    id="productForm"
+    class="form"
+    style="margin-top:20px"
+  >
+
+    <h2>2. Add Product</h2>
+
+    <div class="two">
+
+      <label>
+        Product Name
+
+        <input
+          type="text"
+          id="productName"
+          required
+          placeholder="Product name"
+        >
+
+      </label>
+
+      <label>
+        Category
+
+        <select id="productCategory">
+
+          <option value="Water & Beverage">
+            Water & Beverage
+          </option>
+
+          <option value="Retail Products">
+            Retail Products
+          </option>
+
+        </select>
+
+      </label>
+
+    </div>
+
+    <div class="two">
+
+      <label>
+        Price
+
+        <input
+          type="number"
+          id="productPrice"
+          step="0.01"
+          required
+          placeholder="0"
+        >
+
+      </label>
+
+      <label>
+        Unit
+
+        <input
+          type="text"
+          id="productUnit"
+          value="/ Piece"
+        >
+
+      </label>
+
+    </div>
+
+    <div class="two">
+
+      <label>
+        MOQ
+
+        <input
+          type="number"
+          id="productMOQ"
+          value="1"
+          min="1"
+        >
+
+      </label>
+
+      <label>
+        Image
+
+        <input
+          type="file"
+          id="productImage"
+          accept="image/*"
+        >
+
+      </label>
+
+    </div>
+
+    <label>
+      Description
+
+      <textarea
+        id="productDescription"
+        rows="5"
+        placeholder="Product details"
+      ></textarea>
+
+    </label>
+
+    <button
+      type="submit"
+      class="btn green"
+      id="productButton"
+    >
+      Submit for Admin Approval
+    </button>
+
+  </form>
+
+
+  <div
+    id="message"
+    style="margin-top:20px;font-weight:bold"
+  ></div>
+
+</main>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const sellerForm =
+    document.getElementById("sellerForm");
+
+  const productForm =
+    document.getElementById("productForm");
+
+  const message =
+    document.getElementById("message");
+
+  const sellerButton =
+    document.getElementById("sellerButton");
+
+  const productButton =
+    document.getElementById("productButton");
+
+
+  function getToken() {
+
+    return localStorage.getItem("vxToken");
+
+  }
+
+
+  function showMessage(text, success = false) {
+
+    message.textContent = text;
+
+    message.style.color =
+      success ? "green" : "red";
+
+  }
+
+
+  /* CREATE SELLER */
+
+  sellerForm.addEventListener(
+    "submit",
+    async function (event) {
+
+      event.preventDefault();
+
+      const token = getToken();
+
+      if (!token) {
+
+        showMessage(
+          "Please login before creating seller profile."
+        );
+
+        return;
+
+      }
+
+
+      sellerButton.disabled = true;
+
+      sellerButton.textContent =
+        "Creating...";
+
+      showMessage(
+        "Creating seller profile...",
+        true
+      );
+
+
+      const data = {
+
+        business_name:
+          document.getElementById(
+            "businessName"
+          ).value.trim(),
+
+        category:
+          document.getElementById(
+            "sellerCategory"
+          ).value,
+
+        city:
+          document.getElementById(
+            "sellerCity"
+          ).value.trim()
+
+      };
+
+
+      try {
+
+        const response = await fetch(
+          "/api/sellers",
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json",
+
+              "Authorization":
+                "Bearer " + token
+
+            },
+
+            body:
+              JSON.stringify(data)
+
+          }
+        );
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.error ||
+            "Seller profile creation failed"
+          );
+
+        }
+
+
+        showMessage(
+          "Seller profile created successfully! Seller ID: " +
+          (result.sellerId || "Created"),
+          true
+        );
+
+
+      } catch (error) {
+
+        showMessage(
+          error.message
+        );
+
+      } finally {
+
+        sellerButton.disabled = false;
+
+        sellerButton.textContent =
+          "Create Seller Profile";
+
+      }
+
+    }
+  );
+
+
+  /* ADD PRODUCT */
+
+  productForm.addEventListener(
+    "submit",
+    async function (event) {
+
+      event.preventDefault();
+
+
+      const token = getToken();
+
+      if (!token) {
+
+        showMessage(
+          "Please login before adding a product."
+        );
+
+        return;
+
+      }
+
+
+      productButton.disabled = true;
+
+      productButton.textContent =
+        "Submitting...";
+
+
+      showMessage(
+        "Submitting product...",
+        true
+      );
+
+
+      const formData =
+        new FormData();
+
+
+      formData.append(
+        "name",
+        document.getElementById(
+          "productName"
+        ).value.trim()
+      );
+
+
+      formData.append(
+        "category",
+        document.getElementById(
+          "productCategory"
+        ).value
+      );
+
+
+      formData.append(
+        "price",
+        document.getElementById(
+          "productPrice"
+        ).value
+      );
+
+
+      formData.append(
+        "unit",
+        document.getElementById(
+          "productUnit"
+        ).value
+      );
+
+
+      formData.append(
+        "moq",
+        document.getElementById(
+          "productMOQ"
+        ).value
+      );
+
+
+      formData.append(
+        "description",
+        document.getElementById(
+          "productDescription"
+        ).value
+      );
+
+
+      const image =
+        document.getElementById(
+          "productImage"
+        ).files[0];
+
+
+      if (image) {
+
+        formData.append(
+          "image",
+          image
+        );
+
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/products",
+            {
+
+              method: "POST",
+
+              headers: {
+
+                "Authorization":
+                  "Bearer " + token
+
+              },
+
+              body: formData
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.error ||
+            "Product submission failed"
+          );
+
+        }
+
+
+        showMessage(
+          "Product submitted successfully! Product ID: " +
+          (result.productId || "Created"),
+          true
+        );
+
+
+        productForm.reset();
+
+
+      } catch (error) {
+
+        showMessage(
+          error.message
+        );
+
+      } finally {
+
+        productButton.disabled = false;
+
+        productButton.textContent =
+          "Submit for Admin Approval";
+
+      }
+
+    }
+  );
+
+});
+
+</script>
+
+</body>
+</html>
