@@ -6,112 +6,88 @@ const sellerForm = document.getElementById("seller");
 const productForm = document.getElementById("product");
 const message = document.getElementById("msg");
 
-function getToken() {
+function token() {
   return localStorage.getItem("vxToken");
 }
 
-async function send(url, options = {}) {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("Please login first.");
-  }
-
-  const headers = {
-    ...(options.headers || {}),
-    Authorization: "Bearer " + token
-  };
-
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
-
-  let data = {};
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error("Server returned an invalid response.");
-  }
-
-  if (!response.ok) {
-    throw new Error(data.error || "Request failed");
-  }
-
-  return data;
-}
-
-sellerForm.addEventListener("submit", async function(e) {
-  e.preventDefault();
+sellerForm.addEventListener("submit", async function(event) {
+  event.preventDefault();
 
   message.textContent = "Creating seller profile...";
-  message.style.color = "blue";
-
-  const formData = new FormData(sellerForm);
 
   const data = {
-    business_name: formData.get("business_name"),
-    category: formData.get("category"),
-    city: formData.get("city")
+    business_name: sellerForm.elements.business_name.value,
+    category: sellerForm.elements.category.value,
+    city: sellerForm.elements.city.value
   };
 
   try {
-    const result = await send("/api/sellers", {
+    const response = await fetch("/api/sellers", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token()
       },
       body: JSON.stringify(data)
     });
 
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Seller profile creation failed");
+    }
+
     message.textContent =
       "Seller profile created successfully! Seller ID: " +
-      result.sellerId;
+      (result.sellerId || "");
 
     message.style.color = "green";
 
   } catch (error) {
-
     message.textContent = error.message;
     message.style.color = "red";
-
-    if (
-      error.message === "Login required" ||
-      error.message === "Invalid or expired login"
-    ) {
-      setTimeout(() => {
-        window.location.href = "/login.html";
-      }, 1500);
-    }
   }
 });
 
-productForm.addEventListener("submit", async function(e) {
-  e.preventDefault();
+
+productForm.addEventListener("submit", async function(event) {
+  event.preventDefault();
 
   message.textContent = "Submitting product...";
-  message.style.color = "blue";
 
   const formData = new FormData(productForm);
 
   try {
-    const result = await send("/api/products", {
+    const response = await fetch("/api/products", {
       method: "POST",
+      headers: {
+        "Authorization": "Bearer " + token()
+      },
       body: formData
     });
 
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Product submission failed");
+    }
+
     message.textContent =
-      "Product submitted for admin approval. Product ID: " +
-      result.productId;
+      "Product submitted successfully! Product ID: " +
+      (result.productId || "");
 
     message.style.color = "green";
 
     productForm.reset();
 
   } catch (error) {
-
     message.textContent = error.message;
     message.style.color = "red";
   }
 });
+<script>
+...
 </script>
+
+</body>
+</html>
