@@ -2,6 +2,45 @@
 let all=[];
 function card(p){return `<article class="card"><div class="pic">${p.image?`<img src="${p.image}" style="max-width:90%;max-height:90%;object-fit:contain">`:(p.category==='Water & Beverage'?'💧':'🛍️')}</div><small>${p.category}</small><h3>${p.name}</h3><div class="rating">★ ${p.rating||4.4}</div><div class="price">₹${p.price} <small>${p.unit||'/ Piece'}</small></div><small>${p.business_name||''} ✓</small><div><button class="btn blue" onclick="enquiry(${p.id})">Enquiry</button><a class="btn green" href="/product.html?id=${p.id}">Details</a></div></article>`}
 async function render(){const q=document.getElementById('search').value.toLowerCase(),cat=document.getElementById('filterCat').value,max=+document.getElementById('maxPrice').value;let a=all.filter(p=>(!q||(p.name+' '+p.category+' '+(p.business_name||'')).toLowerCase().includes(q))&&(cat==='All'||p.category===cat)&&p.price<=max);const s=document.getElementById('sort').value;if(s==='low')a.sort((x,y)=>x.price-y.price);if(s==='high')a.sort((x,y)=>y.price-x.price);products.innerHTML=a.map(card).join('')||'<div class="notice">No products found.</div>';count.textContent='Showing '+a.length+' products';priceText.textContent='₹'+max}
-async function enquiry(id){const n=prompt('Your name?');if(!n)return;const phone=prompt('Mobile number?');if(!phone)return;const message=prompt('Requirement?')||'';const r=await fetch('/api/enquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_id:id,buyer_name:n,buyer_phone:phone,message})});alert(r.ok?'Enquiry submitted.':'Could not submit enquiry.')}
+async function enquiry(id){
+  const p=all.find(x=>x.id===id);
+  if(!p)return;
+
+  const n=prompt('Your name?');
+  if(!n)return;
+
+  const phone=prompt('Mobile number?');
+  if(!phone)return;
+
+  const message=prompt('Requirement?')||'';
+
+  const r=await fetch('/api/enquiries',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      product_id:id,
+      buyer_name:n,
+      buyer_phone:phone,
+      message
+    })
+  });
+
+  if(r.ok){
+    const text=`Hello, I am interested in ${p.name}.
+Product Price: ₹${p.price}
+My Name: ${n}
+Mobile: ${phone}
+Requirement: ${message}
+
+Please share product details and availability.`;
+
+    window.open(
+      `https://wa.me/917045047906?text=${encodeURIComponent(text)}`,
+      '_blank'
+    );
+  }else{
+    alert('Could not submit enquiry.');
+  }
+}
 (async()=>{let r=await fetch('/api/products');all=await r.json();if(!all.length){all=[{id:1,name:'VyapaarX 20L Water Jar',category:'Water & Beverage',price:65,unit:'/ Jar',business_name:'Sumit Aqua Solutions',rating:4.7},{id:2,name:'VyapaarX Drinking Water 500ml',category:'Water & Beverage',price:110,unit:'/ Box',business_name:'VyapaarX Beverages',rating:4.6},{id:3,name:'Orange Drink 600ml',category:'Water & Beverage',price:180,unit:'/ Box',business_name:'Fresh Beverages',rating:4.3},{id:4,name:'Healthy Mix Dry Fruits 200g',category:'Retail Products',price:220,unit:'/ Pack',business_name:'Royal Retail Mart',rating:4.5}]}render()})();
 </script></body></html>
