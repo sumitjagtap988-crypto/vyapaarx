@@ -1,3 +1,222 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login | VyapaarX</title><link rel="stylesheet" href="style.css"></head><body><main class="page"><div class="form"><h1>VyapaarX Login</h1><label>Email<input id="email" type="email"></label><label>Password<input id="password" type="password"></label><button class="btn blue" onclick="login()">Login</button><p id="msg"></p><hr><p>New buyer? Register through the API or add a registration page in the next UI pass.</p></div></main><script>
-async function login(){const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.value,password:password.value})});const x=await r.json();msg.textContent=x.error||'Login successful';if(x.token){localStorage.setItem('vxToken',x.token);location.href='/';}}
-</script></body></html>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login | VyapaarX</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <a class="brand" href="/">
+    Vyapaar<span>X</span>
+    <small>Marketplace</small>
+  </a>
+
+  <nav>
+    <a href="/">Home</a>
+    <a href="/products.html">Products</a>
+    <a href="/seller.html">Sell</a>
+    <button id="logoutBtn" class="btn" style="display:none" onclick="logout()">
+      Logout
+    </button>
+  </nav>
+</header>
+
+<main class="page">
+
+  <div class="form">
+    <h1>VyapaarX Login</h1>
+
+    <label>
+      Email
+      <input id="email" type="email" required>
+    </label>
+
+    <label>
+      Password
+      <input id="password" type="password" required>
+    </label>
+
+    <button class="btn blue" onclick="login()">Login</button>
+
+    <p id="msg"></p>
+
+    <hr>
+
+    <p>
+      New Buyer?
+      <button class="btn" onclick="showRegister()">Create Account</button>
+    </p>
+  </div>
+
+
+  <!-- REGISTER FORM -->
+
+  <div id="registerBox" class="form" style="display:none;margin-top:20px">
+
+    <h2>Create Buyer Account</h2>
+
+    <label>
+      Name
+      <input id="regName" type="text" required>
+    </label>
+
+    <label>
+      Email
+      <input id="regEmail" type="email" required>
+    </label>
+
+    <label>
+      Phone
+      <input id="regPhone" type="tel">
+    </label>
+
+    <label>
+      Password
+      <input id="regPassword" type="password" required>
+    </label>
+
+    <button class="btn green" onclick="registerUser()">
+      Register
+    </button>
+
+    <p id="regMsg"></p>
+
+  </div>
+
+</main>
+
+
+<script>
+
+async function login(){
+
+  const emailValue = document.getElementById("email").value.trim();
+  const passwordValue = document.getElementById("password").value;
+
+  const msg = document.getElementById("msg");
+
+  if(!emailValue || !passwordValue){
+    msg.textContent = "Email and password required";
+    msg.style.color = "red";
+    return;
+  }
+
+  msg.textContent = "Logging in...";
+  msg.style.color = "";
+
+  try{
+
+    const response = await fetch("/api/auth/login",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        email:emailValue,
+        password:passwordValue
+      })
+    });
+
+    const result = await response.json();
+
+    if(!response.ok){
+      throw new Error(result.error || "Login failed");
+    }
+
+    localStorage.setItem("vxToken",result.token);
+
+    msg.textContent = "Login successful!";
+    msg.style.color = "green";
+
+    setTimeout(function(){
+      location.href="/";
+    },500);
+
+  }catch(error){
+
+    msg.textContent = error.message;
+    msg.style.color = "red";
+
+  }
+}
+
+
+function showRegister(){
+
+  document.getElementById("registerBox").style.display="block";
+
+}
+
+
+async function registerUser(){
+
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const phone = document.getElementById("regPhone").value.trim();
+  const password = document.getElementById("regPassword").value;
+
+  const regMsg = document.getElementById("regMsg");
+
+  if(!name || !email || !password){
+
+    regMsg.textContent="Name, email and password are required";
+    regMsg.style.color="red";
+    return;
+
+  }
+
+  regMsg.textContent="Creating account...";
+
+  try{
+
+    const response = await fetch("/api/auth/register",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        name:name,
+        email:email,
+        phone:phone,
+        password:password
+      })
+    });
+
+    const result = await response.json();
+
+    if(!response.ok){
+      throw new Error(result.error || "Registration failed");
+    }
+
+    regMsg.textContent="Account created successfully! Now login.";
+    regMsg.style.color="green";
+
+    document.getElementById("email").value=email;
+
+    document.getElementById("registerBox").style.display="none";
+
+  }catch(error){
+
+    regMsg.textContent=error.message;
+    regMsg.style.color="red";
+
+  }
+}
+
+
+function logout(){
+
+  localStorage.removeItem("vxToken");
+
+  location.href="/login.html";
+
+}
+
+</script>
+
+</body>
+</html>
