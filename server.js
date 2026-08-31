@@ -64,10 +64,7 @@ async function initDB() {
       status TEXT NOT NULL DEFAULT 'pending',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-  await pool.query(`
-    ALTER TABLE products
-    ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}'
-  `);
+  
     CREATE TABLE IF NOT EXISTS enquiries(
       id SERIAL PRIMARY KEY,
       product_id INTEGER REFERENCES products(id),
