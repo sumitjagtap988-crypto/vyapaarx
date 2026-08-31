@@ -176,14 +176,17 @@
       </label>
 
       <label>
-        Image
+  Product Photos
 
-        <input
-          type="file"
-          id="productImage"
-          accept="image/*"
-        >
+  <input
+    type="file"
+    id="productImages"
+    name="images"
+    accept="image/*"
+    multiple
+  >
 
+  <small>Select up to 5 photos</small>
       </label>
 
     </div>
@@ -458,20 +461,32 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
 
-      const image =
-        document.getElementById(
-          "productImage"
-        ).files[0];
+      const images =
+  document.getElementById(
+    "productImages"
+  ).files;
 
+if (images.length > 5) {
 
-      if (image) {
+  showMessage(
+    "Maximum 5 photos allowed."
+  );
 
-        formData.append(
-          "image",
-          image
-        );
+  productButton.disabled = false;
+  productButton.textContent =
+    "Submit for Admin Approval";
 
-      }
+  return;
+}
+
+for (let i = 0; i < images.length; i++) {
+
+  formData.append(
+    "images",
+    images[i]
+  );
+
+}
 
 
       try {
