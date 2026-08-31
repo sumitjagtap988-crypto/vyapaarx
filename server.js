@@ -336,7 +336,7 @@ app.post("/api/sellers", auth, async (req, res) => {
 app.post(
   "/api/products",
   auth,
-  upload.single("image"),
+  upload.array("images", 5),
   async (req, res) => {
     try {
       const {
@@ -384,29 +384,44 @@ app.post(
       }
 
       let image = "";
+let images = [];
 
-if (req.file) {
-  const result = await new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "vyapaarx/products"
-      },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
+if (req.files && req.files.length > 0) {
 
-    stream.end(req.file.buffer);
-  });
+  for (const file of req.files) {
 
-  image = result.secure_url;
+    const result = await new Promise((resolve, reject) => {
+
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: "vyapaarx/products"
+        },
+        (error, result) => {
+
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+
+        }
+      );
+
+      stream.end(file.buffer);
+
+    });
+
+    images.push(result.secure_url);
+  }
+
+  // First image remains the main product image
+  image = images[0];
 }
 
       const result = await pool.query(
         `INSERT INTO products
-        (seller_id,name,category,price,unit,moq,description,image,status)
-        VALUES($1,$2,$3,$4,$5,$6,$7,$8,'pending')
+        (seller_id,name,category,price,unit,moq,description,image,images,status)
+VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,'pending')
         RETURNING id,status`,
         [
           seller.id,
@@ -416,7 +431,8 @@ if (req.file) {
           unit || "/ Piece",
           Number(moq || 1),
           description || "",
-          image
+image,
+images
         ]
       );
 
