@@ -1,10 +1,114 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Sell on VyapaarX</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .seller-page {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .box {
+      background: #fff;
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    }
+
+    .box h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      background: #2874f0;
+      color: white;
+      border: 0;
+      padding: 13px 22px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      background: #1257c7;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 7px;
+      display: none;
+    }
+
+    .success {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .error {
+      background: #ffebee;
+      color: #b71c1c;
+    }
+
+    .photo-info {
+      margin-top: 7px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    #selectedPhotos {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    @media (max-width: 600px) {
+      .seller-page {
+        padding: 12px;
+        margin: 15px auto;
+      }
+
+      .box {
+        padding: 18px;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -12,484 +116,582 @@
 <header>
   <a class="brand" href="/">
     Vyapaar<span>X</span>
-    <small>Seller Centre</small>
+    <small>Business Connect. Trade. Grow.</small>
   </a>
 
   <nav>
     <a href="/">Home</a>
     <a href="/products.html">Products</a>
-    <a href="/login.html">Login</a>
+    <a href="/seller.html">Sell</a>
   </nav>
 </header>
 
-<main class="page">
 
-  <h1>Sell on VyapaarX</h1>
+<main class="seller-page">
 
-  <p>
-    Create your seller profile and list your products.
-  </p>
+  <!-- SELLER REGISTRATION -->
+  <section class="box">
 
-  <!-- SELLER PROFILE -->
+    <h2>Become a Seller</h2>
 
-  <form id="sellerForm" class="form">
+    <form id="sellerForm">
 
-    <h2>1. Seller Profile</h2>
+      <div class="form-group">
+        <label for="businessName">Business Name</label>
 
-    <label>
-      Business Name
-      <input
-        type="text"
-        id="businessName"
-        required
-        placeholder="Your business name"
-      >
-    </label>
+        <input
+          type="text"
+          id="businessName"
+          required
+          placeholder="Enter business name"
+        >
+      </div>
 
-    <div class="two">
 
-      <label>
-        Category
+      <div class="form-group">
+        <label for="sellerCategory">Business Category</label>
 
-        <select id="sellerCategory">
+        <select id="sellerCategory" required>
+
+          <option value="">Select Category</option>
 
           <option value="Water & Beverage">
             Water & Beverage
           </option>
 
-          <option value="Retail Products">
-            Retail Products
+          <option value="Plastic">
+            Plastic
+          </option>
+
+          <option value="Clothing">
+            Clothing
+          </option>
+
+          <option value="Electronics">
+            Electronics
+          </option>
+
+          <option value="Food">
+            Food
+          </option>
+
+          <option value="Other">
+            Other
           </option>
 
         </select>
+      </div>
 
-      </label>
 
-      <label>
-        City
+      <div class="form-group">
+        <label for="sellerCity">City</label>
 
         <input
           type="text"
           id="sellerCity"
-          placeholder="Dombivli"
           required
+          placeholder="Enter city"
         >
-
-      </label>
-
-    </div>
-
-    <button
-      type="submit"
-      class="btn blue"
-      id="sellerButton"
-    >
-      Create Seller Profile
-    </button>
-
-  </form>
+      </div>
 
 
-  <!-- PRODUCT -->
+      <button type="submit" class="btn">
+        Register Seller
+      </button>
 
-  <form
-    id="productForm"
-    class="form"
-    style="margin-top:20px"
-  >
+    </form>
 
-    <h2>2. Add Product</h2>
+    <div id="sellerMessage" class="message"></div>
 
-    <div class="two">
+  </section>
 
-      <label>
-        Product Name
+
+
+  <!-- ADD PRODUCT -->
+  <section class="box">
+
+    <h2>Add Product</h2>
+
+    <form id="productForm">
+
+      <div class="form-group">
+
+        <label for="productName">
+          Product Name
+        </label>
 
         <input
           type="text"
           id="productName"
           required
-          placeholder="Product name"
+          placeholder="Enter product name"
         >
 
-      </label>
+      </div>
 
-      <label>
-        Category
 
-        <select id="productCategory">
+
+      <div class="form-group">
+
+        <label for="productCategory">
+          Product Category
+        </label>
+
+        <select id="productCategory" required>
+
+          <option value="">
+            Select Category
+          </option>
 
           <option value="Water & Beverage">
             Water & Beverage
           </option>
 
-          <option value="Retail Products">
-            Retail Products
+          <option value="Plastic">
+            Plastic
+          </option>
+
+          <option value="Clothing">
+            Clothing
+          </option>
+
+          <option value="Electronics">
+            Electronics
+          </option>
+
+          <option value="Food">
+            Food
+          </option>
+
+          <option value="Other">
+            Other
           </option>
 
         </select>
 
-      </label>
+      </div>
 
-    </div>
 
-    <div class="two">
 
-      <label>
-        Price
+      <div class="form-group">
+
+        <label for="productPrice">
+          Price
+        </label>
 
         <input
           type="number"
           id="productPrice"
+          min="0"
           step="0.01"
           required
-          placeholder="0"
+          placeholder="Enter price"
         >
 
-      </label>
+      </div>
 
-      <label>
-        Unit
+
+
+      <div class="form-group">
+
+        <label for="productUnit">
+          Unit
+        </label>
 
         <input
           type="text"
           id="productUnit"
-          value="/ Piece"
+          placeholder="Example: / Piece, / Kg, / Box"
         >
 
-      </label>
+      </div>
 
-    </div>
 
-    <div class="two">
 
-      <label>
-        MOQ
+      <div class="form-group">
+
+        <label for="productMOQ">
+          Minimum Order Quantity
+        </label>
 
         <input
           type="number"
           id="productMOQ"
-          value="1"
           min="1"
+          value="1"
+          required
         >
 
-      </label>
-
-      <label>
-  Product Photos
-
-  <input
-    type="file"
-    id="productImages"
-    name="images"
-    accept="image/*"
-    multiple
-  >
-
-  <small>Select up to 5 photos</small>
-      </label>
-
-    </div>
-
-    <label>
-      Description
-
-      <textarea
-        id="productDescription"
-        rows="5"
-        placeholder="Product details"
-      ></textarea>
-
-    </label>
-
-    <button
-      type="submit"
-      class="btn green"
-      id="productButton"
-    >
-      Submit for Admin Approval
-    </button>
-
-  </form>
+      </div>
 
 
-  <div
-    id="message"
-    style="margin-top:20px;font-weight:bold"
-  ></div>
+
+      <div class="form-group">
+
+        <label for="productDescription">
+          Product Description
+        </label>
+
+        <textarea
+          id="productDescription"
+          placeholder="Enter product details"
+        ></textarea>
+
+      </div>
+
+
+
+      <!-- MULTIPLE PHOTO UPLOAD -->
+
+      <div class="form-group">
+
+        <label for="productImages">
+          Product Photos
+        </label>
+
+        <input
+          type="file"
+          id="productImages"
+          name="images"
+          accept="image/*"
+          multiple
+        >
+
+        <div class="photo-info">
+          You can select up to 5 photos.
+        </div>
+
+        <div id="selectedPhotos"></div>
+
+      </div>
+
+
+
+      <button type="submit" class="btn">
+        Submit Product
+      </button>
+
+    </form>
+
+    <div id="productMessage" class="message"></div>
+
+  </section>
 
 </main>
 
 
+
+<footer>
+  © 2026 VyapaarX
+</footer>
+
+
+
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
+  /*
+   * TOKEN
+   */
 
-  const sellerForm =
-    document.getElementById("sellerForm");
-
-  const productForm =
-    document.getElementById("productForm");
-
-  const message =
-    document.getElementById("message");
-
-  const sellerButton =
-    document.getElementById("sellerButton");
-
-  const productButton =
-    document.getElementById("productButton");
+  const token = localStorage.getItem("vxToken");
 
 
-  function getToken() {
+  /*
+   * SELLER REGISTRATION
+   */
 
-    return localStorage.getItem("vxToken");
+  document
+    .getElementById("sellerForm")
+    .addEventListener("submit", async function (e) {
 
-  }
+      e.preventDefault();
 
+      const message =
+        document.getElementById("sellerMessage");
 
-  function showMessage(text, success = false) {
-
-    message.textContent = text;
-
-    message.style.color =
-      success ? "green" : "red";
-
-  }
-
-
-  /* CREATE SELLER */
-
-  sellerForm.addEventListener(
-    "submit",
-    async function (event) {
-
-      event.preventDefault();
-
-      const token = getToken();
-
-      if (!token) {
-
-        showMessage(
-          "Please login before creating seller profile."
-        );
-
-        return;
-
-      }
-
-
-      sellerButton.disabled = true;
-
-      sellerButton.textContent =
-        "Creating...";
-
-      showMessage(
-        "Creating seller profile...",
-        true
-      );
-
-
-      const data = {
-
-        business_name:
-          document.getElementById(
-            "businessName"
-          ).value.trim(),
-
-        category:
-          document.getElementById(
-            "sellerCategory"
-          ).value,
-
-        city:
-          document.getElementById(
-            "sellerCity"
-          ).value.trim()
-
-      };
+      message.style.display = "block";
+      message.className = "message";
+      message.textContent = "Registering seller...";
 
 
       try {
 
-        const response = await fetch(
-          "/api/sellers",
-          {
+        const response = await fetch("/api/sellers", {
 
-            method: "POST",
+          method: "POST",
 
-            headers: {
+          headers: {
+            "Content-Type": "application/json",
 
-              "Content-Type":
-                "application/json",
+            ...(token
+              ? {
+                  Authorization:
+                    "Bearer " + token
+                }
+              : {})
+          },
 
-              "Authorization":
-                "Bearer " + token
+          body: JSON.stringify({
 
-            },
+            businessName:
+              document
+                .getElementById("businessName")
+                .value
+                .trim(),
 
-            body:
-              JSON.stringify(data)
+            category:
+              document
+                .getElementById("sellerCategory")
+                .value,
 
-          }
-        );
+            city:
+              document
+                .getElementById("sellerCity")
+                .value
+                .trim()
+
+          })
+
+        });
 
 
-        const result =
-          await response.json();
+        const data = await response.json();
 
 
         if (!response.ok) {
 
           throw new Error(
-            result.error ||
-            "Seller profile creation failed"
+            data.message ||
+            data.error ||
+            "Seller registration failed"
           );
 
         }
 
 
-        showMessage(
-          "Seller profile created successfully! Seller ID: " +
-          (result.sellerId || "Created"),
-          true
-        );
+        message.className =
+          "message success";
 
+        message.textContent =
+          data.message ||
+          "Seller registered successfully.";
 
-      } catch (error) {
-
-        showMessage(
-          error.message
-        );
-
-      } finally {
-
-        sellerButton.disabled = false;
-
-        sellerButton.textContent =
-          "Create Seller Profile";
+        document
+          .getElementById("sellerForm")
+          .reset();
 
       }
 
-    }
-  );
+      catch (error) {
+
+        message.className =
+          "message error";
+
+        message.textContent =
+          error.message;
+
+      }
+
+    });
 
 
-  /* ADD PRODUCT */
 
-  productForm.addEventListener(
-    "submit",
-    async function (event) {
+  /*
+   * SHOW SELECTED PHOTOS
+   */
 
-      event.preventDefault();
+  document
+    .getElementById("productImages")
+    .addEventListener("change", function () {
+
+      const files = this.files;
+
+      const selected =
+        document.getElementById("selectedPhotos");
 
 
-      const token = getToken();
+      if (files.length > 5) {
 
-      if (!token) {
-
-        showMessage(
-          "Please login before adding a product."
+        alert(
+          "Maximum 5 photos allowed."
         );
+
+        this.value = "";
+
+        selected.textContent = "";
 
         return;
 
       }
 
 
-      productButton.disabled = true;
+      if (files.length === 0) {
 
-      productButton.textContent =
-        "Submitting...";
+        selected.textContent =
+          "No photos selected.";
 
+        return;
 
-      showMessage(
-        "Submitting product...",
-        true
-      );
+      }
 
 
-      const formData =
-        new FormData();
+      selected.textContent =
+        files.length +
+        " photo(s) selected.";
+
+    });
 
 
-      formData.append(
-        "name",
-        document.getElementById(
-          "productName"
-        ).value.trim()
-      );
+
+  /*
+   * ADD PRODUCT
+   */
+
+  document
+    .getElementById("productForm")
+    .addEventListener("submit", async function (e) {
+
+      e.preventDefault();
 
 
-      formData.append(
-        "category",
-        document.getElementById(
-          "productCategory"
-        ).value
-      );
+      const message =
+        document.getElementById("productMessage");
 
 
-      formData.append(
-        "price",
-        document.getElementById(
-          "productPrice"
-        ).value
-      );
+      message.style.display = "block";
+      message.className = "message";
+      message.textContent =
+        "Uploading product...";
 
 
-      formData.append(
-        "unit",
-        document.getElementById(
-          "productUnit"
-        ).value
-      );
+      if (!token) {
+
+        message.className =
+          "message error";
+
+        message.textContent =
+          "Please login first.";
+
+        return;
+
+      }
 
 
-      formData.append(
-        "moq",
-        document.getElementById(
-          "productMOQ"
-        ).value
-      );
+      const files =
+        document
+          .getElementById("productImages")
+          .files;
 
 
-      formData.append(
-        "description",
-        document.getElementById(
-          "productDescription"
-        ).value
-      );
+      /*
+       * MAX 5 PHOTOS
+       */
 
+      if (files.length > 5) {
 
-      const images =
-  document.getElementById(
-    "productImages"
-  ).files;
+        message.className =
+          "message error";
 
-if (images.length > 5) {
+        message.textContent =
+          "Maximum 5 photos allowed.";
 
-  showMessage(
-    "Maximum 5 photos allowed."
-  );
+        return;
 
-  productButton.disabled = false;
-  productButton.textContent =
-    "Submit for Admin Approval";
-
-  return;
-}
-
-for (let i = 0; i < images.length; i++) {
-
-  formData.append(
-    "images",
-    images[i]
-  );
-
-}
+      }
 
 
       try {
+
+        const formData =
+          new FormData();
+
+
+        /*
+         * PRODUCT DETAILS
+         */
+
+        formData.append(
+          "name",
+
+          document
+            .getElementById("productName")
+            .value
+            .trim()
+        );
+
+
+        formData.append(
+          "category",
+
+          document
+            .getElementById("productCategory")
+            .value
+        );
+
+
+        formData.append(
+          "price",
+
+          document
+            .getElementById("productPrice")
+            .value
+        );
+
+
+        formData.append(
+          "unit",
+
+          document
+            .getElementById("productUnit")
+            .value
+            .trim()
+        );
+
+
+        formData.append(
+          "moq",
+
+          document
+            .getElementById("productMOQ")
+            .value
+        );
+
+
+        formData.append(
+          "description",
+
+          document
+            .getElementById("productDescription")
+            .value
+            .trim()
+        );
+
+
+        /*
+         * MULTIPLE IMAGES
+         *
+         * IMPORTANT:
+         * Backend uses:
+         * upload.array("images", 5)
+         */
+
+        for (
+          let i = 0;
+          i < files.length;
+          i++
+        ) {
+
+          formData.append(
+            "images",
+            files[i]
+          );
+
+        }
+
+
+        /*
+         * SEND PRODUCT
+         */
 
         const response =
           await fetch(
@@ -500,7 +702,7 @@ for (let i = 0; i < images.length; i++) {
 
               headers: {
 
-                "Authorization":
+                Authorization:
                   "Bearer " + token
 
               },
@@ -511,49 +713,62 @@ for (let i = 0; i < images.length; i++) {
           );
 
 
-        const result =
+        const data =
           await response.json();
 
 
         if (!response.ok) {
 
           throw new Error(
-            result.error ||
-            "Product submission failed"
+
+            data.message ||
+            data.error ||
+            "Product upload failed"
+
           );
 
         }
 
 
-        showMessage(
-          "Product submitted successfully! Product ID: " +
-          (result.productId || "Created"),
-          true
-        );
+        message.className =
+          "message success";
+
+        message.textContent =
+          data.message ||
+          "Product submitted successfully. Waiting for admin approval.";
 
 
-        productForm.reset();
+        /*
+         * RESET FORM
+         */
+
+        document
+          .getElementById("productForm")
+          .reset();
 
 
-      } catch (error) {
-
-        showMessage(
-          error.message
-        );
-
-      } finally {
-
-        productButton.disabled = false;
-
-        productButton.textContent =
-          "Submit for Admin Approval";
+        document
+          .getElementById("selectedPhotos")
+          .textContent = "";
 
       }
 
-    }
-  );
 
-});
+      catch (error) {
+
+        console.error(error);
+
+
+        message.className =
+          "message error";
+
+        message.textContent =
+          error.message ||
+          "Something went wrong.";
+
+      }
+
+    });
 
 </script>
 
