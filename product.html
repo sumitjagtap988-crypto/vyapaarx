@@ -1,8 +1,650 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Product | VyapaarX</title><link rel="stylesheet" href="style.css"></head><body><header><a class="brand" href="/">Vyapaar<span>X</span><small>Business Connect. Trade. Grow.</small></a><nav><a href="/">Home</a><a href="/products.html">Products</a><a href="/seller.html">Sell</a></nav></header><main class="page" id="detail"></main><footer>© 2026 VyapaarX</footer><script src="app.js"></script>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Product | VyapaarX</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+
+  <a class="brand" href="/">
+    Vyapaar<span>X</span>
+    <small>Business Connect. Trade. Grow.</small>
+  </a>
+
+  <nav>
+
+    <a href="/">Home</a>
+
+    <a href="/products.html">
+      Products
+    </a>
+
+    <a href="/cart.html">
+      🛒 Cart
+      <span id="cartCount">0</span>
+    </a>
+
+    <a href="/seller.html">
+      Sell
+    </a>
+
+  </nav>
+
+</header>
+
+
+<main class="page" id="detail">
+
+  <p>Loading product...</p>
+
+</main>
+
+
+<footer>
+  © 2026 VyapaarX
+</footer>
+
+
+<script src="app.js"></script>
+
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  if (typeof productDetail === "function") {
-    productDetail();
+
+/* =========================
+   CART SYSTEM
+========================= */
+
+function getCart() {
+
+  try {
+
+    return JSON.parse(
+      localStorage.getItem("vxCart") || "[]"
+    );
+
+  } catch (e) {
+
+    return [];
+
   }
-});
+
+}
+
+
+function saveCart(cart) {
+
+  localStorage.setItem(
+    "vxCart",
+    JSON.stringify(cart)
+  );
+
+  updateCartCount();
+
+}
+
+
+function updateCartCount() {
+
+  const cart = getCart();
+
+  const count =
+    cart.reduce(
+      (total, item) =>
+        total + Number(item.quantity || 1),
+      0
+    );
+
+  const el =
+    document.getElementById("cartCount");
+
+  if (el) {
+
+    el.textContent = count;
+
+  }
+
+}
+
+
+/* =========================
+   ADD TO CART
+========================= */
+
+function addToCart(product) {
+
+  const cart = getCart();
+
+  const existing =
+    cart.find(
+      item =>
+        String(item.id) ===
+        String(product.id)
+    );
+
+
+  if (existing) {
+
+    existing.quantity =
+      Number(existing.quantity || 1) + 1;
+
+  } else {
+
+    cart.push({
+
+      id: product.id,
+
+      name: product.name,
+
+      price: Number(product.price),
+
+      unit: product.unit || "/ Piece",
+
+      image: product.image || "",
+
+      images: product.images || [],
+
+      business_name:
+        product.business_name ||
+        "VyapaarX Seller",
+
+      quantity: 1
+
+    });
+
+  }
+
+
+  saveCart(cart);
+
+
+  alert(
+    "Product added to cart successfully!"
+  );
+
+}
+
+
+/* =========================
+   PRODUCT DETAILS
+========================= */
+
+async function loadProductForCart() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const id =
+    params.get("id");
+
+
+  if (!id) return;
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/products/" +
+        encodeURIComponent(id)
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Product not found"
+      );
+
+    }
+
+
+    const product =
+      await response.json();
+
+
+    const detail =
+      document.getElementById("detail");
+
+
+    if (!detail) return;
+
+
+    /* =========================
+       MULTIPLE PRODUCT IMAGES
+    ========================= */
+
+    let productImages = [];
+
+
+    if (
+      Array.isArray(product.images) &&
+      product.images.length > 0
+    ) {
+
+      productImages =
+        product.images;
+
+    }
+
+
+    if (
+      product.image &&
+      !productImages.includes(product.image)
+    ) {
+
+      productImages.unshift(
+        product.image
+      );
+
+    }
+
+
+    let mainImage =
+      productImages[0] || "";
+
+
+    let galleryHTML = "";
+
+
+    if (productImages.length > 0) {
+
+      galleryHTML = `
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:15px;
+          "
+        >
+
+          ${productImages.map(
+            (img, index) => `
+
+              <img
+                src="${img}"
+                onclick="changeMainImage('${img}')"
+                style="
+                  width:70px;
+                  height:70px;
+                  object-fit:contain;
+                  border:1px solid #ddd;
+                  border-radius:8px;
+                  padding:5px;
+                  cursor:pointer;
+                  background:#fff;
+                "
+              >
+
+            `
+          ).join("")}
+
+        </div>
+
+      `;
+
+    }
+
+
+    const imageHTML =
+      mainImage
+
+        ? `
+
+          <img
+            id="mainProductImage"
+            src="${mainImage}"
+            alt="${product.name}"
+            style="
+              width:100%;
+              max-width:450px;
+              height:400px;
+              object-fit:contain;
+              display:block;
+              margin:auto;
+            "
+          >
+
+          ${galleryHTML}
+
+        `
+
+        : `
+
+          <div
+            style="
+              font-size:100px;
+              text-align:center;
+              padding:100px 0;
+            "
+          >
+            ${
+              product.category ===
+              "Water & Beverage"
+                ? "💧"
+                : "🛍️"
+            }
+          </div>
+
+        `;
+
+
+    detail.innerHTML = `
+
+      <div class="breadcrumb">
+
+        <a href="/products.html">
+          Products
+        </a>
+
+        ›
+
+        ${product.name}
+
+      </div>
+
+
+      <div class="productbox">
+
+
+        <!-- PRODUCT IMAGE -->
+
+        <div class="bigpic">
+
+          ${imageHTML}
+
+        </div>
+
+
+        <!-- PRODUCT DETAILS -->
+
+        <div>
+
+          <span class="tag">
+            ✓ VyapaarX Product
+          </span>
+
+
+          <h1>
+            ${product.name}
+          </h1>
+
+
+          <div class="rating">
+            ★ ${product.rating || "4.4"}
+          </div>
+
+
+          <p>
+
+            <strong>
+              Seller:
+            </strong>
+
+            ${product.business_name ||
+              "VyapaarX Seller"}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Category:
+            </strong>
+
+            ${product.category || "-"}
+
+          </p>
+
+
+          <!-- PRICE -->
+
+          <div
+            class="price"
+            style="font-size:34px"
+          >
+
+            ₹${product.price}
+
+            <small>
+              ${product.unit || "/ Piece"}
+            </small>
+
+          </div>
+
+
+          <p>
+
+            <strong>
+              MOQ:
+            </strong>
+
+            ${product.moq || 1}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Description:
+            </strong>
+
+            <br>
+
+            ${product.description ||
+              "Quality product listed on VyapaarX marketplace."}
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              City:
+            </strong>
+
+            ${product.city || "-"}
+
+          </p>
+
+
+          <p>
+
+            🛡️ Verified Seller
+
+            <br>
+
+            🚚 Delivery Available
+
+            <br>
+
+            📲 WhatsApp Enquiry
+
+          </p>
+
+
+          <!-- ADD TO CART -->
+
+          <button
+            class="btn blue"
+            onclick='addToCart(${JSON.stringify(product)})'
+          >
+
+            🛒 Add to Cart
+
+          </button>
+
+
+          <!-- BUY NOW -->
+
+          <button
+            class="btn green"
+            onclick='buyNow(${JSON.stringify(product)})'
+          >
+
+            ⚡ Buy Now
+
+          </button>
+
+
+          <br><br>
+
+
+          <!-- WHATSAPP -->
+
+          <button
+            class="btn"
+            onclick="openWhatsApp(${product.id})"
+          >
+
+            💬 Chat on WhatsApp
+
+          </button>
+
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    updateCartCount();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById(
+      "detail"
+    ).innerHTML = `
+
+      <div class="notice">
+
+        <h2>
+          Product details not found
+        </h2>
+
+        <a href="/products.html">
+          ← Back to Products
+        </a>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   CHANGE MAIN IMAGE
+========================= */
+
+function changeMainImage(image) {
+
+  const main =
+    document.getElementById(
+      "mainProductImage"
+    );
+
+  if (main) {
+
+    main.src = image;
+
+  }
+
+}
+
+
+/* =========================
+   BUY NOW
+========================= */
+
+function buyNow(product) {
+
+  const cart = getCart();
+
+
+  const existing =
+    cart.find(
+      item =>
+        String(item.id) ===
+        String(product.id)
+    );
+
+
+  if (existing) {
+
+    existing.quantity = 1;
+
+  } else {
+
+    cart.push({
+
+      id: product.id,
+
+      name: product.name,
+
+      price: Number(product.price),
+
+      unit: product.unit || "/ Piece",
+
+      image: product.image || "",
+
+      images: product.images || [],
+
+      business_name:
+        product.business_name ||
+        "VyapaarX Seller",
+
+      quantity: 1
+
+    });
+
+  }
+
+
+  saveCart(cart);
+
+
+  window.location.href =
+    "/cart.html";
+
+}
+
+
+/* =========================
+   PAGE LOAD
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+    updateCartCount();
+
+    loadProductForCart();
+
+  }
+);
+
 </script>
+
+</body>
+</html>
