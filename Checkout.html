@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Checkout - VyapaarX</title>
+
+  <!-- Razorpay Checkout -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6f8;
+      color: #222;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .back {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 25px auto;
+      padding: 0 15px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      font-size: 19px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #2563eb;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .payment-option {
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .payment-option:hover {
+      border-color: #2563eb;
+    }
+
+    .payment-option.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .payment-option label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .payment-option input {
+      width: auto;
+      margin: 0;
+    }
+
+    .payment-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .payment-desc {
+      font-size: 13px;
+      color: #666;
+      margin-left: 27px;
+      margin-top: 5px;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cart-item img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #eee;
+    }
+
+    .cart-info {
+      flex: 1;
+    }
+
+    .cart-name {
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .cart-price {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+      font-size: 15px;
+    }
+
+    .summary-row.total {
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      margin-top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .place-btn {
+      width: 100%;
+      border: none;
+      background: #16a34a;
+      color: white;
+      padding: 15px;
+      border-radius: 9px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .place-btn:hover {
+      background: #15803d;
+    }
+
+    .place-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .secure {
+      text-align: center;
+      color: #666;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 10px;
+      color: #666;
+    }
+
+    .success-box {
+      display: none;
+      background: #ecfdf5;
+      border: 1px solid #86efac;
+      color: #166534;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .success-box h2 {
+      margin-bottom: 10px;
+    }
+
+    .success-btn {
+      display: inline-block;
+      margin-top: 15px;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      padding: 11px 18px;
+      border-radius: 8px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 10px;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      header {
+        padding: 14px 15px;
+      }
+
+      .logo {
+        font-size: 21px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">VyapaarX</div>
+  <a href="/cart.html" class="back">← Back to Cart</a>
+</header>
+
+<div class="container">
+
+  <h1>Checkout</h1>
+
+  <div id="successBox" class="success-box">
+    <h2>✅ Order Placed Successfully!</h2>
+    <p id="successMessage"></p>
+    <a href="/products.html" class="success-btn">Continue Shopping</a>
+  </div>
+
+  <div id="checkoutArea">
+
+    <div class="grid">
+
+      <!-- LEFT SIDE -->
+      <div>
+
+        <!-- DELIVERY ADDRESS -->
+        <div class="card">
+          <h2>📍 Delivery Address</h2>
+
+          <label for="customerName">Full Name</label>
+          <input
+            type="text"
+            id="customerName"
+            placeholder="Enter your full name"
+            required
+          >
+
+          <label for="phone">Mobile Number</label>
+          <input
+            type="tel"
+            id="phone"
+            placeholder="10 digit mobile number"
+            maxlength="10"
+            required
+          >
+
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+          >
+
+          <label for="address">Complete Address</label>
+          <textarea
+            id="address"
+            placeholder="House no., Building, Street, Area"
+            required
+          ></textarea>
+
+          <label for="city">City</label>
+          <input
+            type="text"
+            id="city"
+            placeholder="Enter city"
+            required
+          >
+
+          <label for="pincode">Pincode</label>
+          <input
+            type="text"
+            id="pincode"
+            placeholder="6 digit pincode"
+            maxlength="6"
+            required
+          >
+
+        </div>
+
+
+        <!-- PAYMENT -->
+        <div class="card">
+          <h2>💳 Payment Method</h2>
+
+          <div class="payment-option selected" id="codBox">
+            <label>
+              <input
+                type="radio"
+                name="payment"
+                value="cod"
+                checked
+                onchange="selectPayment('cod')"
+              >
+
+              <span class="payment-title">
+                💵 Cash on Delivery
+              </span>
+            </label>
+
+            <div class="payment-desc">
+              Pay when your order is delivered.
+            </div>
+          </div>
+
+
+          <div class="payment-option" id="onlineBox">
+            <label>
+              <input
+                type="radio"
+                name="payment"
+                value="online"
+                onchange="selectPayment('online')"
+              >
+
+              <span class="payment-title">
+                💳 Online Payment
+              </span>
+            </label>
+
+            <div class="payment-desc">
+              UPI, Debit Card, Credit Card, Net Banking & other supported methods.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- RIGHT SIDE -->
+      <div>
+
+        <!-- ORDER SUMMARY -->
+        <div class="card">
+          <h2>🛒 Order Summary</h2>
+
+          <div id="cartItems"></div>
+
+          <div id="emptyCart" class="empty" style="display:none;">
+            Your cart is empty.
+            <br><br>
+            <a href="/products.html">Continue Shopping</a>
+          </div>
+
+          <div id="summary">
+
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="subtotal">₹0</span>
+            </div>
+
+            <div class="summary-row">
+              <span>Delivery</span>
+              <span id="delivery">₹40</span>
+            </div>
+
+            <div class="summary-row total">
+              <span>Total</span>
+              <span id="grandTotal">₹0</span>
+            </div>
+
+            <button
+              id="placeOrderBtn"
+              class="place-btn"
+              onclick="placeOrder()"
+            >
+              🛍️ Place Order
+            </button>
+
+            <div id="loading" class="loading">
+              Please wait...
+            </div>
+
+            <div class="secure">
+              🔒 Secure Checkout
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  let cart = [];
+  let subtotalAmount = 0;
+  let deliveryAmount = 40;
+  let grandTotalAmount = 0;
+  let paymentMethod = "cod";
+
+
+  /* =========================
+     LOAD CART
+  ========================= */
+
+  function loadCart() {
+
+    try {
+      cart = JSON.parse(
+        localStorage.getItem("vxCart") || "[]"
+      );
+    } catch (error) {
+      cart = [];
+    }
+
+    if (!Array.isArray(cart) || cart.length === 0) {
+
+      document.getElementById("cartItems").style.display = "none";
+      document.getElementById("summary").style.display = "none";
+      document.getElementById("emptyCart").style.display = "block";
+
+      return;
+    }
+
+    renderCart();
+  }
+
+
+  /* =========================
+     RENDER CART
+  ========================= */
+
+  function renderCart() {
+
+    const cartItems =
+      document.getElementById("cartItems");
+
+    cartItems.innerHTML = "";
+
+    subtotalAmount = 0;
+
+    cart.forEach(item => {
+
+      const price = Number(item.price || 0);
+      const quantity = Number(item.quantity || 1);
+
+      const total = price * quantity;
+
+      subtotalAmount += total;
+
+      const div = document.createElement("div");
+
+      div.className = "cart-item";
+
+      div.innerHTML = `
+        <img
+          src="${escapeHtml(item.image || '')}"
+          alt="${escapeHtml(item.name || 'Product')}"
+          onerror="this.style.display='none'"
+        >
+
+        <div class="cart-info">
+
+          <div class="cart-name">
+            ${escapeHtml(item.name || "Product")}
+          </div>
+
+          <div class="cart-price">
+            ₹${price.toFixed(2)}
+            × ${quantity}
+            = ₹${total.toFixed(2)}
+          </div>
+
+        </div>
+      `;
+
+      cartItems.appendChild(div);
+
+    });
+
+
+    /*
+      Same delivery rule as cart.html:
+      ₹40 below ₹500
+      FREE for ₹500+
+    */
+
+    deliveryAmount =
+      subtotalAmount >= 500 ? 0 : 40;
+
+    grandTotalAmount =
+      subtotalAmount + deliveryAmount;
+
+
+    document.getElementById("subtotal").textContent =
+      "₹" + subtotalAmount.toFixed(2);
+
+    document.getElementById("delivery").textContent =
+      deliveryAmount === 0
+        ? "FREE"
+        : "₹" + deliveryAmount.toFixed(2);
+
+    document.getElementById("grandTotal").textContent =
+      "₹" + grandTotalAmount.toFixed(2);
+
+  }
+
+
+  /* =========================
+     PAYMENT SELECTION
+  ========================= */
+
+  function selectPayment(method) {
+
+    paymentMethod = method;
+
+    const codBox =
+      document.getElementById("codBox");
+
+    const onlineBox =
+      document.getElementById("onlineBox");
+
+
+    codBox.classList.remove("selected");
+    onlineBox.classList.remove("selected");
+
+
+    if (method === "cod") {
+      codBox.classList.add("selected");
+
+      document.getElementById("placeOrderBtn")
+        .innerHTML = "🛍️ Place Order";
+    }
+
+    if (method === "online") {
+      onlineBox.classList.add("selected");
+
+      document.getElementById("placeOrderBtn")
+        .innerHTML =
+        "💳 Pay ₹" + grandTotalAmount.toFixed(2);
+    }
+
+  }
+
+
+  /* =========================
+     VALIDATE ADDRESS
+  ========================= */
+
+  function validateForm() {
+
+    const name =
+      document.getElementById("customerName").value.trim();
+
+    const phone =
+      document.getElementById("phone").value.trim();
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const address =
+      document.getElementById("address").value.trim();
+
+    const city =
+      document.getElementById("city").value.trim();
+
+    const pincode =
+      document.getElementById("pincode").value.trim();
+
+
+    if (!name) {
+      alert("Please enter your name.");
+      return false;
+    }
+
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+      alert("Please enter a valid 10 digit mobile number.");
+      return false;
+    }
+
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Please enter a valid email address.");
+      return false;
+    }
+
+
+    if (!address) {
+      alert("Please enter your complete address.");
+      return false;
+    }
+
+
+    if (!city) {
+      alert("Please enter your city.");
+      return false;
+    }
+
+
+    if (!/^[0-9]{6}$/.test(pincode)) {
+      alert("Please enter a valid 6 digit pincode.");
+      return false;
+    }
+
+
+    return true;
+
+  }
+
+
+  /* =========================
+     PLACE ORDER
+  ========================= */
+
+  async function placeOrder() {
+
+    if (cart.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+
+
+    if (!validateForm()) {
+      return;
+    }
+
+
+    const button =
+      document.getElementById("placeOrderBtn");
+
+    button.disabled = true;
+
+    document.getElementById("loading").style.display =
+      "block";
+
+
+    try {
+
+      if (paymentMethod === "cod") {
+
+        await placeCODOrder();
+
+      } else {
+
+        await startOnlinePayment();
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        error.message ||
+        "Something went wrong. Please try again."
+      );
+
+      button.disabled = false;
+
+      document.getElementById("loading").style.display =
+        "none";
+    }
+
+  }
+
+
+  /* =========================
+     COD ORDER
+  ========================= */
+
+  async function placeCODOrder() {
+
+    const customer =
+      getCustomerDetails();
+
+
+    /*
+      IMPORTANT:
+      This expects your server.js /api/orders
+      endpoint to accept these fields.
+    */
+
+    const response = await fetch("/api/orders", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      credentials: "include",
+
+      body: JSON.stringify({
+
+        items: cart,
+
+        total: grandTotalAmount,
+
+        paymentMethod: "cod",
+
+        customerName: customer.name,
+
+        phone: customer.phone,
+
+        email: customer.email,
+
+        address: customer.address,
+
+        city: customer.city,
+
+        pincode: customer.pincode
+
+      })
+
+    });
+
+
+    const data = await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.message ||
+        data.error ||
+        "Unable to place order."
+      );
+
+    }
+
+
+    completeOrder(
+      data.orderId ||
+      data.id ||
+      data.order_id ||
+      ""
+    );
+
+  }
+
+
+  /* =========================
+     ONLINE PAYMENT
+  ========================= */
+
+  async function startOnlinePayment() {
+
+    const customer =
+      getCustomerDetails();
+
+
+    /*
+      Your server must create a Razorpay Order.
+
+      Expected response example:
+
+      {
+        "id": "order_xxxxx",
+        "amount": 10000,
+        "currency": "INR"
+      }
+    */
+
+    const response = await fetch(
+      "/api/payment/create-order",
+      {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        credentials: "include",
+
+        body: JSON.stringify({
+
+          amount: Math.round(
+            grandTotalAmount * 100
+          ),
+
+          currency: "INR",
+
+          items: cart,
+
+          customerName: customer.name,
+
+          phone: customer.phone,
+
+          email: customer.email,
+
+          address: customer.address,
+
+          city: customer.city,
+
+          pincode: customer.pincode
+
+        })
+
+      }
+    );
+
+
+    const data = await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.message ||
+        data.error ||
+        "Unable to create payment order."
+      );
+
+    }
+
+
+    if (!data.id) {
+
+      throw new Error(
+        "Razorpay order ID was not received."
+      );
+
+    }
+
+
+    /*
+      Razorpay Checkout
+    */
+
+    const options = {
+
+      key:
+        data.key ||
+        "YOUR_RAZORPAY_KEY_ID",
+
+      amount:
+        data.amount ||
+        Math.round(grandTotalAmount * 100),
+
+      currency:
+        data.currency ||
+        "INR",
+
+      name: "VyapaarX",
+
+      description:
+        "VyapaarX Order Payment",
+
+      order_id:
+        data.id,
+
+      prefill: {
+
+        name:
+          customer.name,
+
+        email:
+          customer.email,
+
+        contact:
+          customer.phone
+
+      },
+
+      notes: {
+
+        address:
+          customer.address,
+
+        city:
+          customer.city,
+
+        pincode:
+          customer.pincode
+
+      },
+
+
+      handler:
+        async function (paymentResponse) {
+
+          try {
+
+            await verifyPayment(
+              paymentResponse,
+              customer
+            );
+
+          } catch (error) {
+
+            console.error(error);
+
+            alert(
+              error.message ||
+              "Payment verification failed."
+            );
+
+            document.getElementById(
+              "placeOrderBtn"
+            ).disabled = false;
+
+            document.getElementById(
+              "loading"
+            ).style.display = "none";
+
+          }
+
+        },
+
+
+      modal: {
+
+        ondismiss: function () {
+
+          document.getElementById(
+            "placeOrderBtn"
+          ).disabled = false;
+
+          document.getElementById(
+            "loading"
+          ).style.display = "none";
+
+        }
+
+      },
+
+
+      theme: {
+
+        color: "#111827"
+
+      }
+
+    };
+
+
+    if (
+      !options.key ||
+      options.key === "YOUR_RAZORPAY_KEY_ID"
+    ) {
+
+      throw new Error(
+        "Razorpay Key ID is not configured on the server."
+      );
+
+    }
+
+
+    const razorpay =
+      new Razorpay(options);
+
+
+    razorpay.on(
+      "payment.failed",
+      function (response) {
+
+        console.error(
+          "Payment failed:",
+          response.error
+        );
+
+        alert(
+          response.error.description ||
+          "Payment failed. Please try again."
+        );
+
+        document.getElementById(
+          "placeOrderBtn"
+        ).disabled = false;
+
+        document.getElementById(
+          "loading"
+        ).style.display = "none";
+
+      }
+    );
+
+
+    razorpay.open();
+
+  }
+
+
+  /* =========================
+     VERIFY PAYMENT
+  ========================= */
+
+  async function verifyPayment(
+    paymentResponse,
+    customer
+  ) {
+
+    /*
+      Send Razorpay payment details
+      to the server.
+
+      Server MUST verify signature
+      before creating/confirming order.
+    */
+
+    const response = await fetch(
+      "/api/payment/verify",
+      {
+
+        method: "POST",
+
+        headers: {
+
+          "Content-Type":
+            "application/json"
+
+        },
+
+        credentials: "include",
+
+        body: JSON.stringify({
+
+          razorpay_payment_id:
+            paymentResponse.razorpay_payment_id,
+
+          razorpay_order_id:
+            paymentResponse.razorpay_order_id,
+
+          razorpay_signature:
+            paymentResponse.razorpay_signature,
+
+          items: cart,
+
+          total: grandTotalAmount,
+
+          paymentMethod: "online",
+
+          customerName:
+            customer.name,
+
+          phone:
+            customer.phone,
+
+          email:
+            customer.email,
+
+          address:
+            customer.address,
+
+          city:
+            customer.city,
+
+          pincode:
+            customer.pincode
+
+        })
+
+      }
+    );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.message ||
+        data.error ||
+        "Payment verification failed."
+      );
+
+    }
+
+
+    completeOrder(
+      data.orderId ||
+      data.id ||
+      data.order_id ||
+      paymentResponse.razorpay_order_id
+    );
+
+  }
+
+
+  /* =========================
+     CUSTOMER DETAILS
+  ========================= */
+
+  function getCustomerDetails() {
+
+    return {
+
+      name:
+        document
+          .getElementById("customerName")
+          .value
+          .trim(),
+
+      phone:
+        document
+          .getElementById("phone")
+          .value
+          .trim(),
+
+      email:
+        document
+          .getElementById("email")
+          .value
+          .trim(),
+
+      address:
+        document
+          .getElementById("address")
+          .value
+          .trim(),
+
+      city:
+        document
+          .getElementById("city")
+          .value
+          .trim(),
+
+      pincode:
+        document
+          .getElementById("pincode")
+          .value
+          .trim()
+
+    };
+
+  }
+
+
+  /* =========================
+     ORDER SUCCESS
+  ========================= */
+
+  function completeOrder(orderId) {
+
+    localStorage.removeItem("vxCart");
+
+    document.getElementById(
+      "checkoutArea"
+    ).style.display = "none";
+
+
+    document.getElementById(
+      "successBox"
+    ).style.display = "block";
+
+
+    const message =
+      orderId
+        ? "Your order ID is: " + orderId
+        : "Your order has been confirmed successfully.";
+
+
+    document.getElementById(
+      "successMessage"
+    ).textContent = message;
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+
+  /* =========================
+     ESCAPE HTML
+  ========================= */
+
+  function escapeHtml(value) {
+
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /* =========================
+     START
+  ========================= */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+      loadCart();
+
+      selectPayment("cod");
+
+    }
+  );
+
+</script>
+
+</body>
+</html>
