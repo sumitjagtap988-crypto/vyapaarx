@@ -86,7 +86,10 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
-
+  await pool.query(`
+    ALTER TABLE products
+    ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}'
+  `);
   const adminEmail = process.env.ADMIN_EMAIL || "admin@vyapaarx.com";
   const adminPassword = process.env.ADMIN_PASSWORD || "ChangeMe123!";
 
